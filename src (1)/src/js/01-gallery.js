@@ -1,50 +1,33 @@
 import { galleryItems } from './gallery-items.js';
+// Change code below this line
 
-document.addEventListener('DOMContentLoaded', function () {
-  const galleryList = document.querySelector('.gallery');
+const ul = document.querySelector(".gallery");
 
-  // Step 1: Rendering Gallery Items
-  galleryItems.forEach(item => {
-    const listItem = document.createElement('li');
-    listItem.classList.add('gallery__item');
+galleryItems.forEach(item => {
+    const { description, original, preview } = item;
+    const li = `
+        <li class="gallery__item">
+            <a class="gallery__link" href="javascript:void(0);">
+                <img
+                class="gallery__image"
+                src="${preview}"
+                data-source="${original}"
+                alt="${description}"
+                />
+            </a>
+        </li>
+    `;
 
-    const link = document.createElement('a');
-    link.classList.add('gallery__link');
-    link.href = item.original;
-
-    const image = document.createElement('img');
-    image.classList.add('gallery__image');
-    image.src = item.preview;
-    image.dataset.source = item.original; // Storing large image URL
-    image.alt = item.description;
-
-    link.appendChild(image);
-    listItem.appendChild(link);
-    galleryList.appendChild(listItem);
-  });
-
-  // Step 2, 3, 4, 5: Open modal window, replace image src, close modal on Escape key
-  galleryList.addEventListener('click', function (event) {
-    event.preventDefault();
-    if (event.target.tagName === 'IMG') {
-      const largeImageUrl = event.target.dataset.source;
-      const instance = basicLightbox.create(`
-        <img src="${largeImageUrl}" alt="">
-      `);
-      instance.show();
-
-      // Replace image src with large image URL
-      instance.element().querySelector('img').src = largeImageUrl;
-
-      // Close modal window on Escape key press
-      const closeOnEscape = (event) => {
-        if (event.key === 'Escape') {
-          instance.close();
-          document.removeEventListener('keydown', closeOnEscape);
-        }
-      };
-      document.addEventListener('keydown', closeOnEscape);
-    }
-  });
+    ul.innerHTML += li;
 });
 
+ul.addEventListener("click", (e) => {
+    if (e.target.tagName === "IMG") {
+        let imgSrc = e.target.dataset.source;
+        let bigPicture = basicLightbox.create(`<img src="${imgSrc}" width="800" height="600">`);
+        bigPicture.show();
+        document.addEventListener("keydown", (e) => { 
+            if (e.key === "Escape") bigPicture.close();
+        });
+    }
+});
